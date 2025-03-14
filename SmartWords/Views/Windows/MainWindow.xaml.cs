@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace SmartWords
+namespace SmartWords.Views.Windows
 {
     public partial class MainWindow : Window
     {

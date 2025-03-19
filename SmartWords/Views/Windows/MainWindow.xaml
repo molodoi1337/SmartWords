@@ -6,7 +6,8 @@
         WindowStartupLocation="CenterScreen"
         Background="#FF1E1E1E"
         Foreground="White"
-        FontFamily="Segoe UI" Cursor="">
+        FontFamily="Segoe UI">
+    
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
@@ -95,16 +96,27 @@
         <!-- Анимация для появления элементов -->
         <Storyboard x:Key="FadeInAnimation">
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             From="0" To="1" Duration="0:0:2"/>
+                             From="0" To="1" Duration="0:0:0.5"/>
         </Storyboard>
+
+
+        <!-- Стиль для Grid с анимацией -->
+        <Style TargetType="Grid">
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
-    <TabControl>
+    <TabControl SelectedIndex="1">
         <TabControl.Triggers>
             <EventTrigger RoutedEvent="Loaded">
                 <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
             </EventTrigger>
         </TabControl.Triggers>
+        
         <TabItem Header="Быстрое изучение">
             <Grid Cursor="">
                 <Grid.RowDefinitions>
@@ -128,21 +140,24 @@
             <!--блок Изучение рандомных слов -->
             <Border Grid.Column="0" Background="#FF2D2D2D" CornerRadius="10" Padding="10"
                     Effect="{StaticResource DropShadowEffect}">
-                <Grid Cursor="">
-                    <TextBlock Text="Запомни 10 новых слов" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold"/>
-                    <Button x:Name="NextWordButton" Content="Дальше" VerticalAlignment="Bottom"/>
+                <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                    <TextBlock Text="Смотри и запоминай" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="30"/>
+                            <TextBlock Text="{Binding CurrentWord.En}" Grid.Row="0" FontSize="35" Width="200" Height="50" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            <TextBlock Text="{Binding CurrentWord.Ru}" Grid.Row="1" FontSize="35" Width="auto" Height="100" VerticalAlignment="Top" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding CurrentWord.Tr}" Grid.Row="0" FontSize="24" Width="200" Height="35" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="10,0" Margin="0,40"/>
+                    <Button x:Name="NextWordButton" Content="Дальше" Grid.Row="1" VerticalAlignment="Bottom" Command="{Binding NextWordCommand}"/>
                 </Grid>
             </Border>
             <!-- График успехов -->
             <Border Grid.Column="1" Background="#FF2D2D2D" CornerRadius="10" Padding="10" Margin="20,0,0,0"
                     Effect="{StaticResource DropShadowEffect}">
                 <Grid>
-                    <TextBlock Text="График успехов:" FontSize="20" FontWeight="Bold"/>
-                    <Canvas x:Name="ProgressChart" Height="200" Width="300">
-
-
-                    </Canvas>
-                    <Button Content="Посмотреть за месяц" VerticalAlignment="Bottom"/>
+                     <TextBlock Text="График успехов:" FontSize="20" FontWeight="Bold"/>
+                     <Button Content="Посмотреть за месяц" VerticalAlignment="Bottom"/>
                 </Grid>
             </Border>
         </Grid>
@@ -157,6 +172,23 @@
             </Border.Triggers>
         </Border>
     </Grid>
+        </TabItem>
+        <TabItem Header="Тест" Width="100">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="{Binding CurrentWord.En}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="60" Width="auto" Height="auto" Cursor=""/>
+                <TextBlock Text="{Binding CurrentWord.Tr}" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="40" Width="auto" Height="auto" Cursor=""/>
+
+                <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="">
+                    <Button Content="Привет" Width="450" Height="40" Margin="0,5"/>
+                    <Button Content="Пока" Width="450" Height="40" Margin="0,5"/>
+                    <Button Content="Спасибо" Width="450" Height="40" Margin="0,5"/>
+                </StackPanel>
+            </Grid>
         </TabItem>
     </TabControl>
 </Window>

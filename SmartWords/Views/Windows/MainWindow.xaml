@@ -7,14 +7,26 @@
         Background="#FF1E1E1E"
         Foreground="White"
         FontFamily="Segoe UI">
-    
+
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
-    
+
     <Window.Resources>
         <!-- Ресурс для тени -->
         <DropShadowEffect x:Key="DropShadowEffect" ShadowDepth="0" BlurRadius="10" Color="#40000000"/>
+
+        <!-- Анимация для правильного ответа (зеленый) -->
+        <Storyboard x:Key="CorrectAnswerAnimation">
+            <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                        To="Green" Duration="0:0:0.3"/>
+        </Storyboard>
+
+        <!-- Анимация для неправильного ответа (красный) -->
+        <Storyboard x:Key="IncorrectAnswerAnimation">
+            <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                        To="Red" Duration="0:0:0.3"/>
+        </Storyboard>
 
         <!-- Стили для кнопок -->
         <Style TargetType="Button">
@@ -43,6 +55,50 @@
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#FF444444"/>
                     <Setter Property="Foreground" Value="#FFDDDDDD"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для кнопок в тесте -->
+        <Style TargetType="Button" x:Key="AnswerButtonStyle">
+            <Setter Property="Background" Value="#FF333333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FF555555"/>
+            <Setter Property="Padding" Value="10 5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Effect" Value="{StaticResource DropShadowEffect}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF444444"/>
+                    <Setter Property="Foreground" Value="#FFDDDDDD"/>
+                </Trigger>
+                <!-- Триггер для нажатия (без зависимости от IsMouseOver) -->
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FF555555"/>
+                    <!-- Темный фон при нажатии -->
+                </Trigger>
+
+                <!-- Триггеры для правильного/неправильного ответа -->
+                <Trigger Property="Tag" Value="Correct">
+                    <Setter Property="Background" Value="Green"/>
+                </Trigger>
+                <Trigger Property="Tag" Value="Incorrect">
+                    <Setter Property="Background" Value="Red"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -86,7 +142,6 @@
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Border" Property="Background" Value="#FF444444"/>
                             </Trigger>
-                           
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -98,7 +153,6 @@
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              From="0" To="1" Duration="0:0:0.5"/>
         </Storyboard>
-
 
         <!-- Стиль для Grid с анимацией -->
         <Style TargetType="Grid">
@@ -116,8 +170,8 @@
                 <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
             </EventTrigger>
         </TabControl.Triggers>
-        
-        <TabItem Header="Быстрое изучение">
+
+        <TabItem Header="Быстрое изучение" >
             <Grid Cursor="">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -126,67 +180,70 @@
                 </Grid.RowDefinitions>
 
                 <!-- Основной контент -->
-        <Grid Grid.Row="1" Margin="20">
-            <Grid.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
-                </EventTrigger>
-            </Grid.Triggers>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+                <Grid Grid.Row="1" Margin="20">
+                    <Grid.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
+                        </EventTrigger>
+                    </Grid.Triggers>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-            <!--блок Изучение рандомных слов -->
-            <Border Grid.Column="0" Background="#FF2D2D2D" CornerRadius="10" Padding="10"
-                    Effect="{StaticResource DropShadowEffect}">
-                <Grid>
+                    <!-- Блок Изучение рандомных слов -->
+                    <Border Grid.Column="0" Background="#FF2D2D2D" CornerRadius="10" Padding="10"
+                            Effect="{StaticResource DropShadowEffect}">
+                        <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                    <TextBlock Text="Смотри и запоминай" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="30"/>
+                            <TextBlock Text="Смотри и запоминай" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="30"/>
                             <TextBlock Text="{Binding CurrentWord.En}" Grid.Row="0" FontSize="35" Width="200" Height="50" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                             <TextBlock Text="{Binding CurrentWord.Ru}" Grid.Row="1" FontSize="35" Width="auto" Height="100" VerticalAlignment="Top" TextWrapping="Wrap"/>
-                    <TextBlock Text="{Binding CurrentWord.Tr}" Grid.Row="0" FontSize="24" Width="200" Height="35" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="10,0" Margin="0,40"/>
-                    <Button x:Name="NextWordButton" Content="Дальше" Grid.Row="1" VerticalAlignment="Bottom" Command="{Binding NextWordCommand}"/>
+                            <TextBlock Text="{Binding CurrentWord.Tr}" Grid.Row="0" FontSize="24" Width="200" Height="35" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="10,0" Margin="0,40"/>
+                            <Button x:Name="NextWordButton" Content="Дальше" Grid.Row="1" VerticalAlignment="Bottom" Command="{Binding NextWordCommand}"/>
+                        </Grid>
+                    </Border>
+                    <!-- График успехов -->
+                    <Border Grid.Column="1" Background="#FF2D2D2D" CornerRadius="10" Padding="10" Margin="20,0,0,0"
+                            Effect="{StaticResource DropShadowEffect}">
+                        <Grid>
+                            <TextBlock Text="График успехов:" FontSize="20" FontWeight="Bold"/>
+                            <Button Content="Посмотреть за месяц" VerticalAlignment="Bottom"/>
+                        </Grid>
+                    </Border>
                 </Grid>
-            </Border>
-            <!-- График успехов -->
-            <Border Grid.Column="1" Background="#FF2D2D2D" CornerRadius="10" Padding="10" Margin="20,0,0,0"
-                    Effect="{StaticResource DropShadowEffect}">
-                <Grid>
-                     <TextBlock Text="График успехов:" FontSize="20" FontWeight="Bold"/>
-                     <Button Content="Посмотреть за месяц" VerticalAlignment="Bottom"/>
-                </Grid>
-            </Border>
-        </Grid>
 
-        <!-- Дополнительный контент -->
-        <Border Grid.Row="2" Background="#FF2D2D2D" CornerRadius="10" Padding="10" Margin="20"
-                Effect="{StaticResource DropShadowEffect}">
-            <Border.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
-                </EventTrigger>
-            </Border.Triggers>
-        </Border>
-    </Grid>
+                <!-- Дополнительный контент -->
+                <Border Grid.Row="2" Background="#FF2D2D2D" CornerRadius="10" Padding="10" Margin="20"
+                        Effect="{StaticResource DropShadowEffect}">
+                    <Border.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
+                        </EventTrigger>
+                    </Border.Triggers>
+                </Border>
+            </Grid>
         </TabItem>
         <TabItem Header="Тест" Width="100">
+            <TabItem.DataContext>
+                <Binding Path="TestViewModel"/>
+                <!-- Привязка к свойству TestViewModel из MainWindowViewModel -->
+            </TabItem.DataContext>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-
-                <TextBlock Text="{Binding CurrentWord.En}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="60" Width="auto" Height="auto" Cursor=""/>
-                <TextBlock Text="{Binding CurrentWord.Tr}" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="40" Width="auto" Height="auto" Cursor=""/>
+                <TextBlock Text="{Binding RussianWord}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="60" Width="auto" Height="auto" Cursor=""/>
+                <TextBlock Text="{Binding Transctiption}" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="40" Width="auto" Height="auto" Cursor=""/>
 
                 <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="">
-                    <Button Content="Привет" Width="450" Height="40" Margin="0,5"/>
-                    <Button Content="Пока" Width="450" Height="40" Margin="0,5"/>
-                    <Button Content="Спасибо" Width="450" Height="40" Margin="0,5"/>
+                    <Button x:Name="Answer1" Content="{Binding Button1Text}" Command="{Binding ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Style="{StaticResource AnswerButtonStyle}" Width="450" Height="40" Margin="0,5"/>
+                    <Button x:Name="Answer2" Content="{Binding Button2Text}" Command="{Binding ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Style="{StaticResource AnswerButtonStyle}" Width="450" Height="40" Margin="0,5"/>
+                    <Button x:Name="Answer3" Content="{Binding Button3Text}" Command="{Binding ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Style="{StaticResource AnswerButtonStyle}" Width="450" Height="40" Margin="0,5"/>
                 </StackPanel>
             </Grid>
         </TabItem>

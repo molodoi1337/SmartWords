@@ -28,22 +28,28 @@ namespace SmartWords.ViewModels
             set => Set(ref _currentWord, value);
         }
 
-        readonly string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SmartWords", "passedIndexes.json");
-        
         private int _currentIndex = 0;
         public int CurrentIndex
         {
             get => _currentIndex;
-            private set { if (Set(ref _currentIndex, value)) OnCurrentIndexChanged(); }
+            private set
+            {
+                if (Set(ref _currentIndex, value))
+                    OnCurrentIndexChanged();
+            }
         }
 
-        private List<int> _passedIndexes;
-        public List<int> PassedIndexes => _passedIndexes;
+        //private List<int> _passedIndexes;
+        //public List<int> PassedIndexes => _passedIndexes;
 
         public LambdaCommand NextWordCommand { get; } // Команда для перехода к следующему слову
 
         private List<Word> _words; // Коллекция слов из JSON
-        public List<Word> Words => _words;
+        public List<Word> Words
+        {
+            get => _words ??= new List<Word>();
+            set => Set(ref _words, value);
+        }
 
         private void LoadWordsFromJson(string filePath)
         {
@@ -59,9 +65,9 @@ namespace SmartWords.ViewModels
                     PropertyNameCaseInsensitive = true // Игнорирование регистра свойств
                 };
 
-                _words = JsonSerializer.Deserialize<List<Word>>(json, options);
+                Words = JsonSerializer.Deserialize<List<Word>>(json, options);
 
-                if (_words == null || _words.Count == 0)
+                if (Words == null || Words.Count == 0)
                 {
                     MessageBox.Show("Файл JSON пуст или не удалось загрузить данные.");
                     return;
@@ -74,7 +80,7 @@ namespace SmartWords.ViewModels
                     return;
                 }
 
-                CurrentWord = _words[CurrentIndex];
+                CurrentWord = Words[CurrentIndex];
             }
             catch (Exception ex)
             {
@@ -84,24 +90,21 @@ namespace SmartWords.ViewModels
 
         private bool CanExecuteNextWord(object parameter)
         {
-            return _words != null && CurrentIndex < _words.Count - 1;
+            return Words != null && CurrentIndex < Words.Count - 1;
         }
 
         private void OnNextWordCommandExecuted(object parameter)
         {
-            if (_words == null || _words.Count == 0)
+            if (Words == null || Words.Count == 0)
                 return;
 
-            _passedIndexes.Add(CurrentIndex);
-
             CurrentIndex++;
-            if (CurrentIndex >= _words.Count)
-                CurrentIndex = 0; // Вернуться к началу списка, если достигнут конец
+            if (CurrentIndex >= Words.Count)
+                CurrentIndex = 0;
 
-            CurrentWord = _words[CurrentIndex];
+            CurrentWord = Words[CurrentIndex];
 
             SaveCurrentIndex();
-            SavePassedIndexes();
         }
 
         private void SaveCurrentIndex()
@@ -115,23 +118,6 @@ namespace SmartWords.ViewModels
             return Properties.Settings.Default.LastWordIndex;
         }
 
-
-        private void SavePassedIndexes()
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath)); // Создаем папку, если её нет
-            File.WriteAllText(filePath, JsonSerializer.Serialize(PassedIndexes));
-        }
-
-        private List<int> LoadPassedIndexes()
-        {
-            List<int> loadedIndexes = null;
-            if (File.Exists(filePath))
-            {
-                string json = File.ReadAllText(filePath);
-                loadedIndexes = JsonSerializer.Deserialize<List<int>>(json);
-            }
-            return loadedIndexes;
-        }
         #endregion
 
         #region CurrentIndexChanged
@@ -142,15 +128,14 @@ namespace SmartWords.ViewModels
             CurrentIndexChanged?.Invoke(_currentIndex);
         }
         #endregion
-
+        public Test TestViewModel { get; }
         public MainWindowViewModel()
         {
             CloseApplicationCommand = new LambdaCommand(OnCloseApplicationCommandExecuted, CanCloseApplicationCommandExecute);
             NextWordCommand = new LambdaCommand(OnNextWordCommandExecuted, CanExecuteNextWord);
-            CurrentIndex = LoadCurrentIndex();
-
+            CurrentIndex = 0;//LoadCurrentIndex();
             LoadWordsFromJson("C:\\Users\\nniki\\source\\repos\\SmartWords\\SmartWords\\Data\\words.json");
-            _passedIndexes = LoadPassedIndexes() ?? new List<int>();
+            TestViewModel = new Test(this);
         }
     }
 }

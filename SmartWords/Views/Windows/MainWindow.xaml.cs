@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using SmartWords.ViewModels;
+using System.Windows;
 
 namespace SmartWords.Views.Windows
 {
@@ -7,6 +8,7 @@ namespace SmartWords.Views.Windows
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainWindowViewModel();
         }
     }
 }

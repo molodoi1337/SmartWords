@@ -13,6 +13,13 @@ namespace SmartWords.ViewModels
         private List<Word> _words;
         static int currentIndex = 0; //Properties.Settings.Default.LastWordIndex;
 
+        private Visibility _isTestTabVisiable = Visibility.Collapsed;
+        public Visibility IsTestTabVisiable
+        {
+            get => _isTestTabVisiable;
+            set => Set(ref _isTestTabVisiable, value);
+        }
+
         private string _textBlockText;
         public string TextBlockText
         {
@@ -137,6 +144,7 @@ namespace SmartWords.ViewModels
             });
         }
         //
+        public Test() { }
         private MainWindowViewModel mainWindow;
         public Test(MainWindowViewModel viewModel)
         {
@@ -144,9 +152,10 @@ namespace SmartWords.ViewModels
             mainWindow.CurrentIndexChanged += OnCurrentIndexChanged;
             _words = mainWindow.Words;
 
+            IsTestTabVisiable = Visibility.Collapsed; 
             ButtonClickCommand = new LambdaCommand(OnButtonClick);
         }
-
+        
         // Обработчик события изменения индекса
         private void OnCurrentIndexChanged(int newIndex)
         {
@@ -155,13 +164,12 @@ namespace SmartWords.ViewModels
 
             if (newIndex % 10 == 0 && newIndex != 0 || newIndex % 100 == 0 && newIndex != 0)
             {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    IsTestTabVisiable = Visibility.Visible;
+                });
                 InitializeButtons();
             }
-        }
-
-        private void ShowTest()
-        {
-
         }
     }
 }

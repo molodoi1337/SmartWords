@@ -5,5 +5,14 @@
     <Setting Name="LastWordIndex" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="StudyVisiable" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Visible</Value>
+    </Setting>
+    <Setting Name="TestVisiable" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Collapsed</Value>
+    </Setting>
+    <Setting Name="CorrectAnswerIndex" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

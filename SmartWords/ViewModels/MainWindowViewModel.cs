@@ -39,9 +39,6 @@ namespace SmartWords.ViewModels
             }
         }
 
-        //private List<int> _passedIndexes;
-        //public List<int> PassedIndexes => _passedIndexes;
-
         public LambdaCommand NextWordCommand { get; } // Команда для перехода к следующему слову
 
         private List<Word> _words; // Коллекция слов из JSON
@@ -115,7 +112,7 @@ namespace SmartWords.ViewModels
 
         private int LoadCurrentIndex()
         {
-            return Properties.Settings.Default.LastWordIndex;
+            return Properties.Settings.Default.LastWordIndex = 0;
         }
 
         #endregion
@@ -133,7 +130,7 @@ namespace SmartWords.ViewModels
         {
             CloseApplicationCommand = new LambdaCommand(OnCloseApplicationCommandExecuted, CanCloseApplicationCommandExecute);
             NextWordCommand = new LambdaCommand(OnNextWordCommandExecuted, CanExecuteNextWord);
-            CurrentIndex = 0;//LoadCurrentIndex();
+            CurrentIndex = LoadCurrentIndex();
             LoadWordsFromJson("C:\\Users\\nniki\\source\\repos\\SmartWords\\SmartWords\\Data\\words.json");
             TestViewModel = new Test(this);
         }

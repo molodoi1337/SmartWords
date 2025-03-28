@@ -11,13 +11,27 @@ namespace SmartWords.ViewModels
         public LambdaCommand ButtonClickCommand { get; }
 
         private List<Word> _words;
-        static int currentIndex = 0; //Properties.Settings.Default.LastWordIndex;
+        static int currentIndex;
 
-        private Visibility _isTestTabVisiable = Visibility.Collapsed;
-        public Visibility IsTestTabVisiable
+        private int _selectedIndex = 0;
+        public int SelectedIndex
         {
-            get => _isTestTabVisiable;
-            set => Set(ref _isTestTabVisiable, value);
+            get => _selectedIndex;
+            set => Set(ref _selectedIndex, value);
+        }
+
+
+        private Visibility _testTabVisiable = LoadTestStatusVisibility();
+        public Visibility TestTabVisiable
+        {
+            get => _testTabVisiable;
+            set => Set(ref _testTabVisiable, value);
+        }
+        private Visibility _studyTabVisiable = LoadStudentStatusVisibility();
+        public Visibility StudyTabVisiable
+        {
+            get => _studyTabVisiable;
+            set => Set(ref _studyTabVisiable, value);
         }
 
         private string _textBlockText;
@@ -26,14 +40,14 @@ namespace SmartWords.ViewModels
             get => _textBlockText;
             set => Set(ref _textBlockText, value);
         }
-        //
+
         private string _button1Text;
         private string _button2Text;
         private string _button3Text;
-        private string _resultMessage;
+        private string _russianWord;
         private string _transctiption;
         private string _correctAnswer;
-        private int _correctAnswerIndex = currentIndex;
+        static private int _correctAnswerIndex = 0;
 
         public string Button1Text
         {
@@ -55,13 +69,46 @@ namespace SmartWords.ViewModels
 
         public string RussianWord
         {
-            get => _resultMessage;
-            private set => Set(ref _resultMessage, value);
+            get => _russianWord;
+            private set => Set(ref _russianWord, value);
         }
         public string Transctiption
         {
             get => _transctiption;
             private set => Set(ref _transctiption, value);
+        }
+        private void SaveStudentStatusVisibility(string status = "Visible")
+        {
+            Properties.Settings.Default.StudyVisiable = status;
+            Properties.Settings.Default.Save();
+        }
+
+        static private Visibility LoadStudentStatusVisibility()
+        {
+            var visibility = Properties.Settings.Default.StudyVisiable == "Collapsed" ? Visibility.Collapsed : Visibility.Visible;
+            return visibility;
+        }
+
+        private void SaveTestStatusVisibility(string status = "Visible")
+        {
+            Properties.Settings.Default.TestVisiable = status;
+            Properties.Settings.Default.Save();
+        }
+
+        static private Visibility LoadTestStatusVisibility()
+        {
+            var visibility = Properties.Settings.Default.TestVisiable == "Collapsed" ? Visibility.Collapsed : Visibility.Visible;
+            return visibility;
+        }
+        private void SaveCorrectAnswerIndex()
+        {
+            Properties.Settings.Default.CorrectAnswerIndex = _correctAnswerIndex;
+            Properties.Settings.Default.Save();
+        }
+
+        static private int LoadCorrectAnswerIndex()
+        {
+            return Properties.Settings.Default.CorrectAnswerIndex;
         }
 
         private void InitializeButtons()
@@ -74,11 +121,11 @@ namespace SmartWords.ViewModels
             // Создаем список для текста кнопок
             List<string> buttonTexts = new List<string> { _correctAnswer }; // Добавляем правильный ответ
 
-            // Добавляем еще два случайных слова (убедимся, что они не совпадают с правильным ответом)
+            // Добавляем еще два случайных слова не совпадающих с ответом
             while (buttonTexts.Count < 3)
             {
                 int temp = currentIndex - 1;
-                string word = _words[random.Next(temp - 9, temp - 1)].Ru;
+                string word = _words[random.Next(temp - 1)].Ru;
                 if (!buttonTexts.Contains(word))
                 {
                     buttonTexts.Add(word);
@@ -122,14 +169,7 @@ namespace SmartWords.ViewModels
 
             _isAnimating = true; // Блокируем кнопки
 
-            if (button.Content?.ToString() == _correctAnswer)
-            {
-                button.Tag = "Correct";
-            }
-            else
-            {
-                button.Tag = "Incorrect";
-            }
+            button.Tag = button.Content?.ToString() == _correctAnswer ? "Correct" : "Incorrect";
 
             _correctAnswerIndex++;
 
@@ -139,12 +179,20 @@ namespace SmartWords.ViewModels
                 {
                     button.Tag = null;
                     _isAnimating = false; // Разблокируем кнопки
-                    InitializeButtons(); // Обновляем вопросы/ответы
+                    if ((_correctAnswerIndex % 10 == 0 && _correctAnswerIndex != 0) || (_correctAnswerIndex % 100 == 0 && _correctAnswerIndex != 0))
+                    {
+                        TestTabVisiable = Visibility.Collapsed;
+                        StudyTabVisiable = Visibility.Visible;
+                        SaveTestStatusVisibility("Collapsed");
+                        SaveStudentStatusVisibility();
+                        SelectedIndex = 0;
+                        _correctAnswerIndex += 10;
+                    }
+                    else { InitializeButtons(); }
                 });
             });
         }
-        //
-        public Test() { }
+
         private MainWindowViewModel mainWindow;
         public Test(MainWindowViewModel viewModel)
         {
@@ -152,22 +200,20 @@ namespace SmartWords.ViewModels
             mainWindow.CurrentIndexChanged += OnCurrentIndexChanged;
             _words = mainWindow.Words;
 
-            IsTestTabVisiable = Visibility.Collapsed; 
             ButtonClickCommand = new LambdaCommand(OnButtonClick);
         }
-        
+
         // Обработчик события изменения индекса
         private void OnCurrentIndexChanged(int newIndex)
         {
-            newIndex--;
-            currentIndex = newIndex;
-
-            if (newIndex % 10 == 0 && newIndex != 0 || newIndex % 100 == 0 && newIndex != 0)
+            if ((newIndex % 10 == 0 && newIndex != 0) || (newIndex % 100 == 0 && newIndex != 0))
             {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    IsTestTabVisiable = Visibility.Visible;
-                });
+                currentIndex = newIndex - 1;
+                TestTabVisiable = Visibility.Visible;
+                StudyTabVisiable = Visibility.Collapsed;
+                SaveTestStatusVisibility();
+                SaveStudentStatusVisibility("Collapsed");
+                SelectedIndex = 1;
                 InitializeButtons();
             }
         }

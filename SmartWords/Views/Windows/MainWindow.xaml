@@ -163,14 +163,14 @@
         </Style>
     </Window.Resources>
 
-    <TabControl SelectedIndex="0">
+    <TabControl SelectedIndex="{Binding TestViewModel.SelectedIndex}">
         <TabControl.Triggers>
             <EventTrigger RoutedEvent="Loaded">
                 <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
             </EventTrigger>
         </TabControl.Triggers>
 
-        <TabItem Header="Быстрое изучение" >
+        <TabItem Header="Быстрое изучение" Visibility="{Binding TestViewModel.StudyTabVisiable}">
             <Grid Cursor="">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -226,7 +226,7 @@
                 </Border>
             </Grid>
         </TabItem>
-        <TabItem x:Name="TestTab" Header="Тест" Width="100"  Visibility="{Binding IsTestTabVisibility}">
+        <TabItem x:Name="TestTab" Header="Тест" Width="100"  Visibility="{Binding TestViewModel.TestTabVisiable}">
             <Grid DataContext="{Binding TestViewModel}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>

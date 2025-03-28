@@ -34,5 +34,41 @@ namespace SmartWords.Properties {
                 this["LastWordIndex"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Visible")]
+        public string StudyVisiable {
+            get {
+                return ((string)(this["StudyVisiable"]));
+            }
+            set {
+                this["StudyVisiable"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Collapsed")]
+        public string TestVisiable {
+            get {
+                return ((string)(this["TestVisiable"]));
+            }
+            set {
+                this["TestVisiable"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CorrectAnswerIndex {
+            get {
+                return ((int)(this["CorrectAnswerIndex"]));
+            }
+            set {
+                this["CorrectAnswerIndex"] = value;
+            }
+        }
     }
 }

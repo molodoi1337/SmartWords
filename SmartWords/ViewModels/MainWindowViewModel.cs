@@ -1,5 +1,7 @@
 ﻿using SmartWords.Infrastructure.Commands.Base;
+using SmartWords.Interface;
 using SmartWords.Models;
+using SmartWords.Services;
 using SmartWords.ViewModels.Base;
 using System.IO;
 using System.Text.Json;
@@ -7,19 +9,8 @@ using System.Windows;
 
 namespace SmartWords.ViewModels
 {
-    internal class MainWindowViewModel : ViewModel
+    internal class MainWindowViewModel : ViewModel,ISavable
     {
-        #region CloseApplicationCommand
-        public LambdaCommand CloseApplicationCommand { get; }
-
-        private bool CanCloseApplicationCommandExecute(object p) => true;
-
-        private void OnCloseApplicationCommandExecuted(object p)
-        {
-            Application.Current.Shutdown();
-        }
-        #endregion
-
         #region NextWordCommand
         private Word _currentWord;
         public Word CurrentWord
@@ -100,8 +91,6 @@ namespace SmartWords.ViewModels
                 CurrentIndex = 0;
 
             CurrentWord = Words[CurrentIndex];
-
-            SaveCurrentIndex();
         }
 
         private void SaveCurrentIndex()
@@ -124,15 +113,21 @@ namespace SmartWords.ViewModels
         {
             CurrentIndexChanged?.Invoke(_currentIndex);
         }
+
+        public void Save()
+        {
+            SaveCurrentIndex();
+        }
         #endregion
         public Test TestViewModel { get; }
         public MainWindowViewModel()
         {
-            CloseApplicationCommand = new LambdaCommand(OnCloseApplicationCommandExecuted, CanCloseApplicationCommandExecute);
             NextWordCommand = new LambdaCommand(OnNextWordCommandExecuted, CanExecuteNextWord);
             CurrentIndex = LoadCurrentIndex();
             LoadWordsFromJson("C:\\Users\\nniki\\source\\repos\\SmartWords\\SmartWords\\Data\\words.json");
             TestViewModel = new Test(this);
+
+            ServiceLocator.Register(this);
         }
     }
 }

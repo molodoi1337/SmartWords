@@ -8,7 +8,7 @@ namespace SmartWords.Views.Windows
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
+            //DataContext = new MainWindowViewModel();
         }
     }
 }

@@ -1,12 +1,14 @@
 ﻿using SmartWords.Infrastructure.Commands.Base;
+using SmartWords.Interface;
 using SmartWords.Models;
+using SmartWords.Services;
 using SmartWords.ViewModels.Base;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace SmartWords.ViewModels
 {
-    class Test : ViewModel
+    class Test : ViewModel, ISavable
     {
         public LambdaCommand ButtonClickCommand { get; }
         public LambdaCommand WindowClosingCommand { get; }
@@ -195,19 +197,6 @@ namespace SmartWords.ViewModels
             });
         }
 
-        private void OnWindowClosing(object? parameter)
-        {
-            if (_isPassingTest)
-            {
-                SelectedIndex = 0;
-                TestTabVisiable = Visibility.Collapsed;
-                StudyTabVisiable = Visibility.Visible;
-            }
-            SaveTestStatusVisibility();
-            SaveStudentStatusVisibility();
-            SaveControlIndex();
-        }
-
         private MainWindowViewModel mainWindow;
         public Test(MainWindowViewModel viewModel)
         {
@@ -216,7 +205,10 @@ namespace SmartWords.ViewModels
             _words = mainWindow.Words;
 
             ButtonClickCommand = new LambdaCommand(OnButtonClick);
-            WindowClosingCommand = new LambdaCommand(OnWindowClosing);
+
+            ServiceLocator.Register(this);
+            WindowClosingCommand = new LambdaCommand((object _) => ServiceLocator.ExecuteAllSaves());
+
         }
 
         // Обработчик события изменения индекса
@@ -234,6 +226,19 @@ namespace SmartWords.ViewModels
                 _isPassingTest = true;
                 InitializeButtons();
             }
+        }
+
+        public void Save()
+        {
+            if (_isPassingTest)
+            {
+                SelectedIndex = 0;
+                TestTabVisiable = Visibility.Collapsed;
+                StudyTabVisiable = Visibility.Visible;
+            }
+            SaveTestStatusVisibility();
+            SaveStudentStatusVisibility();
+            SaveControlIndex();
         }
     }
 }

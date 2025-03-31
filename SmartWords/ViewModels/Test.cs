@@ -121,37 +121,47 @@ namespace SmartWords.ViewModels
 
         private void InitializeButtons()
         {
-            Random random = new Random();
+            if (_correctAnswerIndex >= _words.Count) return; // Защита от выхода за границы списка
 
-            // Выбираем правильный ответ по порядку
+            // Выбираем правильное слово по порядку
             _correctAnswer = _words[_correctAnswerIndex].Ru;
 
-            // Создаем список для текста кнопок
-            List<string> buttonTexts = new List<string> { _correctAnswer }; // Добавляем правильный ответ
+            // Создаем список ответов
+            List<string> buttonTexts = new List<string> { _correctAnswer };
 
-            // Добавляем еще два случайных слова не совпадающих с ответом
+            Random random = new Random();
+
+            int minIndex = Math.Max(0, _correctAnswerIndex - 9); // Если тест после 10 слов
+
+            if (_correctAnswerIndex % 100 == 0)
+                minIndex = Math.Max(0, _correctAnswerIndex - 99); // Если тест после 100 слов
+
+            int maxIndex = _correctAnswerIndex; // Берем слова до текущего индекса
+
+            // Добавляем еще два случайных слова из диапазона
             while (buttonTexts.Count < 3)
             {
-                int temp = currentIndex - 1;
-                string word = _words[random.Next(temp - 1)].Ru;
+                string word = _words[random.Next(minIndex, maxIndex + 1)].Ru;
                 if (!buttonTexts.Contains(word))
                 {
                     buttonTexts.Add(word);
                 }
             }
 
-            // Перемешиваем слова, чтобы правильный ответ не всегда был на одной и той же кнопке
+            // Перемешиваем кнопки
             buttonTexts = Shuffle(buttonTexts);
 
-            // Присваиваем слова кнопкам
+            // Устанавливаем текст кнопок
             Button1Text = buttonTexts[0];
             Button2Text = buttonTexts[1];
             Button3Text = buttonTexts[2];
 
-            // Устанавливаем английское слово и транскрипцию
+            // Устанавливаем слово вопроса (англ. слово и транскрипцию)
             RussianWord = _words[_correctAnswerIndex].En;
             Transctiption = _words[_correctAnswerIndex].Tr;
         }
+
+
 
         private List<string> Shuffle(List<string> list)
         {
@@ -217,7 +227,15 @@ namespace SmartWords.ViewModels
             if ((newIndex % 10 == 0 && newIndex != 0) || (newIndex % 100 == 0 && newIndex != 0))
             {
                 currentIndex = newIndex - 1;
-                _correctAnswerIndex = currentIndex - 9;
+
+                // Если тест идет после 10 слов – берем последние 10 слов
+                if (newIndex % 10 == 0 && newIndex % 100 != 0)
+                    _correctAnswerIndex = Math.Max(0, currentIndex - 9); // Берем последние 10 слов
+
+                // Если тест идет после 100 слов – берем последние 100 слов
+                if (newIndex % 100 == 0)
+                    _correctAnswerIndex = Math.Max(0, currentIndex - 99); // Берем последние 100 слов
+
                 TestTabVisiable = Visibility.Visible;
                 StudyTabVisiable = Visibility.Collapsed;
                 SaveTestStatusVisibility();
@@ -227,6 +245,7 @@ namespace SmartWords.ViewModels
                 InitializeButtons();
             }
         }
+
 
         public void Save()
         {

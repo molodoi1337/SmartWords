@@ -9,11 +9,12 @@ namespace SmartWords.ViewModels
     class Test : ViewModel
     {
         public LambdaCommand ButtonClickCommand { get; }
+        public LambdaCommand WindowClosingCommand { get; }
 
         private List<Word> _words;
         static int currentIndex;
 
-        private int _selectedIndex = 0;
+        private int _selectedIndex = LoadControlIndex();
         public int SelectedIndex
         {
             get => _selectedIndex;
@@ -47,7 +48,9 @@ namespace SmartWords.ViewModels
         private string _russianWord;
         private string _transctiption;
         private string _correctAnswer;
-        static private int _correctAnswerIndex = 0;
+        static private int _correctAnswerIndex;
+        private bool _isAnimating = false; // Флаг для блокировки кнопок
+        private bool _isPassingTest = false;
 
         public string Button1Text
         {
@@ -77,9 +80,11 @@ namespace SmartWords.ViewModels
             get => _transctiption;
             private set => Set(ref _transctiption, value);
         }
-        private void SaveStudentStatusVisibility(string status = "Visible")
+
+        #region SaveAndLoadMethod
+        private void SaveStudentStatusVisibility()
         {
-            Properties.Settings.Default.StudyVisiable = status;
+            Properties.Settings.Default.StudyVisiable = StudyTabVisiable.ToString();
             Properties.Settings.Default.Save();
         }
 
@@ -89,9 +94,9 @@ namespace SmartWords.ViewModels
             return visibility;
         }
 
-        private void SaveTestStatusVisibility(string status = "Visible")
+        private void SaveTestStatusVisibility()
         {
-            Properties.Settings.Default.TestVisiable = status;
+            Properties.Settings.Default.TestVisiable = TestTabVisiable.ToString();
             Properties.Settings.Default.Save();
         }
 
@@ -100,16 +105,17 @@ namespace SmartWords.ViewModels
             var visibility = Properties.Settings.Default.TestVisiable == "Collapsed" ? Visibility.Collapsed : Visibility.Visible;
             return visibility;
         }
-        private void SaveCorrectAnswerIndex()
+
+        private void SaveControlIndex()
         {
-            Properties.Settings.Default.CorrectAnswerIndex = _correctAnswerIndex;
-            Properties.Settings.Default.Save();
+            Properties.Settings.Default.ControlIndex = SelectedIndex;
         }
 
-        static private int LoadCorrectAnswerIndex()
+        static private int LoadControlIndex()
         {
-            return Properties.Settings.Default.CorrectAnswerIndex;
+            return Properties.Settings.Default.ControlIndex;
         }
+        #endregion
 
         private void InitializeButtons()
         {
@@ -160,8 +166,6 @@ namespace SmartWords.ViewModels
             return list;
         }
 
-        private bool _isAnimating = false; // Флаг для блокировки кнопок
-
         private void OnButtonClick(object? parameter)
         {
             if (_isAnimating || parameter is not Button button)
@@ -183,14 +187,25 @@ namespace SmartWords.ViewModels
                     {
                         TestTabVisiable = Visibility.Collapsed;
                         StudyTabVisiable = Visibility.Visible;
-                        SaveTestStatusVisibility("Collapsed");
-                        SaveStudentStatusVisibility();
                         SelectedIndex = 0;
-                        _correctAnswerIndex += 10;
+                        _isPassingTest = false;
                     }
                     else { InitializeButtons(); }
                 });
             });
+        }
+
+        private void OnWindowClosing(object? parameter)
+        {
+            if (_isPassingTest)
+            {
+                SelectedIndex = 0;
+                TestTabVisiable = Visibility.Collapsed;
+                StudyTabVisiable = Visibility.Visible;
+            }
+            SaveTestStatusVisibility();
+            SaveStudentStatusVisibility();
+            SaveControlIndex();
         }
 
         private MainWindowViewModel mainWindow;
@@ -201,6 +216,7 @@ namespace SmartWords.ViewModels
             _words = mainWindow.Words;
 
             ButtonClickCommand = new LambdaCommand(OnButtonClick);
+            WindowClosingCommand = new LambdaCommand(OnWindowClosing);
         }
 
         // Обработчик события изменения индекса
@@ -209,11 +225,13 @@ namespace SmartWords.ViewModels
             if ((newIndex % 10 == 0 && newIndex != 0) || (newIndex % 100 == 0 && newIndex != 0))
             {
                 currentIndex = newIndex - 1;
+                _correctAnswerIndex = currentIndex - 9;
                 TestTabVisiable = Visibility.Visible;
                 StudyTabVisiable = Visibility.Collapsed;
                 SaveTestStatusVisibility();
-                SaveStudentStatusVisibility("Collapsed");
+                SaveStudentStatusVisibility();
                 SelectedIndex = 1;
+                _isPassingTest = true;
                 InitializeButtons();
             }
         }

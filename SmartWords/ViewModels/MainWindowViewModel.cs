@@ -28,7 +28,7 @@ namespace SmartWords.ViewModels
             set => Set(ref _currentWord, value);
         }
 
-        private int _currentIndex = 0;
+        private int _currentIndex;
         public int CurrentIndex
         {
             get => _currentIndex;
@@ -112,7 +112,7 @@ namespace SmartWords.ViewModels
 
         private int LoadCurrentIndex()
         {
-            return Properties.Settings.Default.LastWordIndex = 0;
+            return Properties.Settings.Default.LastWordIndex;
         }
 
         #endregion

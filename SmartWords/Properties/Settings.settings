@@ -11,7 +11,7 @@
     <Setting Name="TestVisiable" Type="System.String" Scope="User">
       <Value Profile="(Default)">Collapsed</Value>
     </Setting>
-    <Setting Name="CorrectAnswerIndex" Type="System.Int32" Scope="User">
+    <Setting Name="ControlIndex" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>

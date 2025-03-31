@@ -62,12 +62,12 @@ namespace SmartWords.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int CorrectAnswerIndex {
+        public int ControlIndex {
             get {
-                return ((int)(this["CorrectAnswerIndex"]));
+                return ((int)(this["ControlIndex"]));
             }
             set {
-                this["CorrectAnswerIndex"] = value;
+                this["ControlIndex"] = value;
             }
         }
     }

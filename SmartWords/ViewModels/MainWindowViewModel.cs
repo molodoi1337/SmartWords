@@ -1,4 +1,6 @@
-﻿using SmartWords.Infrastructure.Commands.Base;
+﻿using LiveCharts;
+using LiveCharts.Wpf;
+using SmartWords.Infrastructure.Commands.Base;
 using SmartWords.Interface;
 using SmartWords.Models;
 using SmartWords.Services;
@@ -6,10 +8,11 @@ using SmartWords.ViewModels.Base;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Media;
 
 namespace SmartWords.ViewModels
 {
-    internal class MainWindowViewModel : ViewModel,ISavable
+    internal class MainWindowViewModel : ViewModel, ISavable
     {
         #region NextWordCommand
         private Word _currentWord;
@@ -119,13 +122,16 @@ namespace SmartWords.ViewModels
             SaveCurrentIndex();
         }
         #endregion
+
         public Test TestViewModel { get; }
+        public PieChart PieChartVM { get; } = new PieChart();
+
         public MainWindowViewModel()
         {
             NextWordCommand = new LambdaCommand(OnNextWordCommandExecuted, CanExecuteNextWord);
             CurrentIndex = LoadCurrentIndex();
             LoadWordsFromJson("C:\\Users\\nniki\\source\\repos\\SmartWords\\SmartWords\\Data\\words.json");
-            TestViewModel = new Test(this);
+            TestViewModel = new Test(this);    
 
             ServiceLocator.Register(this);
         }

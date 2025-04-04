@@ -1,10 +1,15 @@
-﻿using SmartWords.Infrastructure.Commands.Base;
+﻿using LiveCharts;
+using LiveCharts.Wpf;
+using SmartWords.Infrastructure.Commands.Base;
 using SmartWords.Interface;
 using SmartWords.Models;
 using SmartWords.Services;
 using SmartWords.ViewModels.Base;
+using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace SmartWords.ViewModels
 {
@@ -47,10 +52,13 @@ namespace SmartWords.ViewModels
         private string _button1Text;
         private string _button2Text;
         private string _button3Text;
-        private string _russianWord;
+        private string _englishWord;
         private string _transctiption;
         private string _correctAnswer;
         static private int _correctAnswerIndex;
+
+        private int _maxQuestions = 10;
+        int minIndex;
         private bool _isAnimating = false; // Флаг для блокировки кнопок
         private bool _isPassingTest = false;
 
@@ -72,10 +80,10 @@ namespace SmartWords.ViewModels
             set => Set(ref _button3Text, value);
         }
 
-        public string RussianWord
+        public string EnglishWord
         {
-            get => _russianWord;
-            private set => Set(ref _russianWord, value);
+            get => _englishWord;
+            private set => Set(ref _englishWord, value);
         }
         public string Transctiption
         {
@@ -121,8 +129,6 @@ namespace SmartWords.ViewModels
 
         private void InitializeButtons()
         {
-            if (_correctAnswerIndex >= _words.Count) return; // Защита от выхода за границы списка
-
             // Выбираем правильное слово по порядку
             _correctAnswer = _words[_correctAnswerIndex].Ru;
 
@@ -131,17 +137,10 @@ namespace SmartWords.ViewModels
 
             Random random = new Random();
 
-            int minIndex = Math.Max(0, _correctAnswerIndex - 9); // Если тест после 10 слов
-
-            if (_correctAnswerIndex % 100 == 0)
-                minIndex = Math.Max(0, _correctAnswerIndex - 99); // Если тест после 100 слов
-
-            int maxIndex = _correctAnswerIndex; // Берем слова до текущего индекса
-
             // Добавляем еще два случайных слова из диапазона
             while (buttonTexts.Count < 3)
             {
-                string word = _words[random.Next(minIndex, maxIndex + 1)].Ru;
+                string word = _words[random.Next(minIndex, currentIndex)].Ru;
                 if (!buttonTexts.Contains(word))
                 {
                     buttonTexts.Add(word);
@@ -157,11 +156,9 @@ namespace SmartWords.ViewModels
             Button3Text = buttonTexts[2];
 
             // Устанавливаем слово вопроса (англ. слово и транскрипцию)
-            RussianWord = _words[_correctAnswerIndex].En;
+            EnglishWord = _words[_correctAnswerIndex].En;
             Transctiption = _words[_correctAnswerIndex].Tr;
         }
-
-
 
         private List<string> Shuffle(List<string> list)
         {
@@ -185,7 +182,12 @@ namespace SmartWords.ViewModels
 
             _isAnimating = true; // Блокируем кнопки
 
-            button.Tag = button.Content?.ToString() == _correctAnswer ? "Correct" : "Incorrect";
+            bool IsCorrect = button.Content?.ToString() == _correctAnswer;
+
+            button.Tag = IsCorrect ? "Correct" : "Incorrect";
+
+            if (!IsCorrect)
+                _unlearned.AddUnlernedIndex(_correctAnswerIndex);
 
             _correctAnswerIndex++;
 
@@ -195,57 +197,47 @@ namespace SmartWords.ViewModels
                 {
                     button.Tag = null;
                     _isAnimating = false; // Разблокируем кнопки
-                    if ((_correctAnswerIndex % 10 == 0 && _correctAnswerIndex != 0) || (_correctAnswerIndex % 100 == 0 && _correctAnswerIndex != 0))
+                    if (_correctAnswerIndex % _maxQuestions == 0 && _correctAnswerIndex != 0)
                     {
                         TestTabVisiable = Visibility.Collapsed;
                         StudyTabVisiable = Visibility.Visible;
                         SelectedIndex = 0;
                         _isPassingTest = false;
                     }
-                    else { InitializeButtons(); }
+                    else
+                    {
+                        InitializeButtons();
+                    }
                 });
             });
-        }
-
-        private MainWindowViewModel mainWindow;
-        public Test(MainWindowViewModel viewModel)
-        {
-            mainWindow = viewModel;
-            mainWindow.CurrentIndexChanged += OnCurrentIndexChanged;
-            _words = mainWindow.Words;
-
-            ButtonClickCommand = new LambdaCommand(OnButtonClick);
-
-            ServiceLocator.Register(this);
-            WindowClosingCommand = new LambdaCommand((object _) => ServiceLocator.ExecuteAllSaves());
-
         }
 
         // Обработчик события изменения индекса
         private void OnCurrentIndexChanged(int newIndex)
         {
-            if ((newIndex % 10 == 0 && newIndex != 0) || (newIndex % 100 == 0 && newIndex != 0))
+            if (newIndex % 10 == 0 && newIndex != 0)
             {
                 currentIndex = newIndex - 1;
+                minIndex = _correctAnswerIndex;
 
-                // Если тест идет после 10 слов – берем последние 10 слов
-                if (newIndex % 10 == 0 && newIndex % 100 != 0)
-                    _correctAnswerIndex = Math.Max(0, currentIndex - 9); // Берем последние 10 слов
-
-                // Если тест идет после 100 слов – берем последние 100 слов
                 if (newIndex % 100 == 0)
-                    _correctAnswerIndex = Math.Max(0, currentIndex - 99); // Берем последние 100 слов
+                {
+                    _correctAnswerIndex = currentIndex - 99;
+                    _maxQuestions = 100;
+                }
+                else
+                {
+                    _correctAnswerIndex = currentIndex - 9;
+                    _maxQuestions = 10;
+                }
 
                 TestTabVisiable = Visibility.Visible;
                 StudyTabVisiable = Visibility.Collapsed;
-                SaveTestStatusVisibility();
-                SaveStudentStatusVisibility();
                 SelectedIndex = 1;
                 _isPassingTest = true;
                 InitializeButtons();
             }
         }
-
 
         public void Save()
         {
@@ -258,6 +250,81 @@ namespace SmartWords.ViewModels
             SaveTestStatusVisibility();
             SaveStudentStatusVisibility();
             SaveControlIndex();
+        }
+
+        private MainWindowViewModel mainWindow;
+        private Unlearned _unlearned;
+
+        public Test(MainWindowViewModel viewModel)
+        {
+            mainWindow = viewModel;
+            mainWindow.CurrentIndexChanged += OnCurrentIndexChanged;
+            _words = mainWindow.Words;
+
+            ButtonClickCommand = new LambdaCommand(OnButtonClick);
+
+            ServiceLocator.Register(this);
+            WindowClosingCommand = new LambdaCommand((object _) => ServiceLocator.ExecuteAllSaves());
+
+            _unlearned = new(this);
+        }
+
+        class Unlearned : ISavable
+        {
+            private List<int> unlearnedIndexList = new();
+            private readonly string filePath = "unlearned_words.json";
+            private Test _test;
+
+            public Unlearned(Test test)
+            {
+                _test = test;
+                LoadUnlearnedWords();
+                ServiceLocator.Register(this);
+            }
+
+            public void AddUnlernedIndex(int index)
+            {
+                if (!unlearnedIndexList.Contains(index))
+                    unlearnedIndexList.Add(index);
+            }
+
+            private void LoadUnlearnedWords()
+            {
+                try
+                {
+                    if (File.Exists(filePath))
+                    {
+                        string json = File.ReadAllText(filePath);
+                        var wordsFromFile = JsonSerializer.Deserialize<List<int>>(json);
+                        if (wordsFromFile != null)
+                            unlearnedIndexList = wordsFromFile;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при загрузке списка невыученных слов: {ex.Message}");
+                }
+            }
+
+            public void Save()
+            {
+                try
+                {
+                    List<int> beforeGarbageCollector = unlearnedIndexList;
+                    var options = new JsonSerializerOptions
+                    {
+                        WriteIndented = true,
+                        AllowTrailingCommas = true
+                    };
+
+                    string json = JsonSerializer.Serialize(beforeGarbageCollector, options);
+                    File.WriteAllText(filePath, json);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при сохранении не выученных слов : {ex.Message}");
+                }
+            }
         }
     }
 }

@@ -4,6 +4,7 @@
         xmlns:local="clr-namespace:SmartWords.ViewModels" 
         xmlns:base="clr-namespace:SmartWords.ViewModels.Base" 
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         Title="Smart Words" Height="600" Width="1000"
         WindowStartupLocation="CenterScreen"
         Background="#FF1E1E1E"
@@ -157,6 +158,16 @@
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              From="0" To="1" Duration="0:0:0.5"/>
         </Storyboard>
+        
+        <!-- ToolTip для графика -->
+        <Style x:Key="CustomTooltip" TargetType="lvc:DefaultTooltip">
+            <Setter Property="Background" Value="#FF333333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FF555555"/>
+            <Setter Property="ShowTitle" Value="False"/>
+            <Setter Property="ShowSeries" Value="True"/>
+            
+        </Style>
 
         <!-- Стиль для Grid с анимацией -->
         <Style TargetType="Grid">
@@ -214,7 +225,16 @@
                     <Border Grid.Column="1" Background="#FF2D2D2D" CornerRadius="10" Padding="10" Margin="20,0,0,0"
                             Effect="{StaticResource DropShadowEffect}">
                         <Grid>
-                            <TextBlock Text="График успехов:" FontSize="20" FontWeight="Bold"/>
+                            <TextBlock Text="График успехов:" FontSize="18" FontWeight="Bold"/>
+                            <lvc:PieChart Series="{Binding PieChartVM.PieChartSeries}" LegendLocation="Bottom" Height="340">
+                                <lvc:PieChart.DataTooltip>
+                                    <lvc:DefaultTooltip Style="{StaticResource CustomTooltip}">
+                                        <lvc:DefaultTooltip.BulletSize>
+                                            <Binding RelativeSource="{RelativeSource Self}" Path="FontSize"/>
+                                        </lvc:DefaultTooltip.BulletSize>
+                                    </lvc:DefaultTooltip>
+                                </lvc:PieChart.DataTooltip>
+                            </lvc:PieChart>
                             <Button Content="Посмотреть за месяц" VerticalAlignment="Bottom"/>
                         </Grid>
                     </Border>
@@ -237,7 +257,7 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="{Binding RussianWord}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="60" Width="auto" Height="auto" Cursor=""/>
+                <TextBlock Text="{Binding EnglishWord}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="60" Width="auto" Height="auto" Cursor=""/>
                 <TextBlock Text="{Binding Transctiption}" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="40" Width="auto" Height="auto" Cursor=""/>
 
                 <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="">

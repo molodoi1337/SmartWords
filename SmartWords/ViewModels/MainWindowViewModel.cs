@@ -124,14 +124,17 @@ namespace SmartWords.ViewModels
         #endregion
 
         public Test TestViewModel { get; }
-        public PieChart PieChartVM { get; } = new PieChart();
+        public PieChart PieChartVM { get; }
 
         public MainWindowViewModel()
         {
             NextWordCommand = new LambdaCommand(OnNextWordCommandExecuted, CanExecuteNextWord);
             CurrentIndex = LoadCurrentIndex();
             LoadWordsFromJson("C:\\Users\\nniki\\source\\repos\\SmartWords\\SmartWords\\Data\\words.json");
-            TestViewModel = new Test(this);    
+            TestViewModel = new Test(this);
+            
+            PieChartVM = new PieChart(this);
+
 
             ServiceLocator.Register(this);
         }

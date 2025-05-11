@@ -9,12 +9,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Images\soundIcon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BogaNet.TTS" Version="1.4.0" />
     <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
     <PackageReference Include="LiveCharts.Wpf.NetCore3" Version="0.9.8" />
+    <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.43.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.3" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.4" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
     <PackageReference Include="System.Text.Json" Version="9.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Images\soundIcon.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,5 +42,11 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="System.Speech">
+			<HintPath>C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v8.0\System.Speech.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
 </Project>

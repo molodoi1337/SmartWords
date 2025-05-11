@@ -16,6 +16,7 @@ namespace SmartWords.ViewModels
         {
             _test = test;
             LoadUnlearnedWords();
+
             ServiceLocator.Register(this);
         }
 
@@ -25,7 +26,7 @@ namespace SmartWords.ViewModels
                 unlearnedIndexList.Add(index);
         }
 
-        private void LoadUnlearnedWords()
+        public void LoadUnlearnedWords()
         {
             try
             {
@@ -33,6 +34,7 @@ namespace SmartWords.ViewModels
                 {
                     string json = File.ReadAllText(filePath);
                     var wordsFromFile = JsonSerializer.Deserialize<List<int>>(json);
+
                     if (wordsFromFile != null)
                         unlearnedIndexList = wordsFromFile;
                 }
@@ -47,14 +49,13 @@ namespace SmartWords.ViewModels
         {
             try
             {
-                List<int> beforeGarbageCollector = unlearnedIndexList;
                 var options = new JsonSerializerOptions
                 {
                     WriteIndented = true,
                     AllowTrailingCommas = true
                 };
 
-                string json = JsonSerializer.Serialize(beforeGarbageCollector, options);
+                string json = JsonSerializer.Serialize(unlearnedIndexList, options);
                 File.WriteAllText(filePath, json);
             }
             catch (Exception ex)

@@ -4,7 +4,8 @@
         xmlns:local="clr-namespace:SmartWords.ViewModels" 
         xmlns:base="clr-namespace:SmartWords.ViewModels.Base" 
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf" 
+        xmlns:tts="clr-namespace:SmartWords.Services"
         Title="Smart Words" Height="600" Width="1000"
         WindowStartupLocation="CenterScreen"
         Background="#FF1E1E1E"
@@ -18,6 +19,8 @@
     </i:Interaction.Triggers>
     
     <Window.Resources>
+        <tts:TextToSpeechService x:Key="TTS"/>
+
         <!-- Ресурс для тени -->
         <DropShadowEffect x:Key="DropShadowEffect" ShadowDepth="0" BlurRadius="10" Color="#40000000"/>
 
@@ -216,8 +219,8 @@
                             <TextBlock Text="Смотри и запоминай" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="30"/>
                             <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,0,10">
                                 <TextBlock Text="{Binding CurrentWord.En}" FontSize="35" VerticalAlignment="Center"/>
-                                <Button Command="{Binding TTSCommand}">
-                                     <Image Source="\Resources\Images\soundIcon.png" Width="30" Height="30" Margin="10,10,0,0" VerticalAlignment="Center" Cursor="Hand" />
+                                <Button Command="{Binding SpeakWordCommand}" Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand" Height="30">
+                                     <Image Source="\Resources\Images\soundIcon.png" Width="30" Height="30" Margin="10,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Cursor="Hand" />
                                 </Button>
                                
                             </StackPanel>

@@ -1,25 +1,24 @@
-﻿using LiveCharts;
-using LiveCharts.Wpf;
-using SmartWords.Infrastructure.Commands.Base;
+﻿using SmartWords.Infrastructure.Commands.Base;
 using SmartWords.Interface;
 using SmartWords.Models;
 using SmartWords.Services;
 using SmartWords.ViewModels.Base;
-using System.IO;
-using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
+using System.Xml.Serialization;
 
 namespace SmartWords.ViewModels
 {
     class Test : ViewModel, ISavable
     {
+        private readonly TextToSpeechService _ttsService;
+
+        public LambdaCommand SpeakWordCommand { get; }
         public LambdaCommand ButtonClickCommand { get; }
         public LambdaCommand WindowClosingCommand { get; }
 
         private List<Word> _words;
-        static int currentIndex;
+        static int currentIndex = Properties.Settings.Default.LastWordIndex;
 
         private int _selectedIndex = LoadControlIndex();
         public int SelectedIndex
@@ -217,19 +216,20 @@ namespace SmartWords.ViewModels
         // Обработчик события изменения индекса
         private void OnCurrentIndexChanged(int newIndex)
         {
+            currentIndex = newIndex;
             if (newIndex % 10 == 0 && newIndex != 0)
             {
-                currentIndex = newIndex - 1;
+                int testIndex = newIndex - 1;
                 minIndex = _correctAnswerIndex;
 
                 if (newIndex % 100 == 0)
                 {
-                    _correctAnswerIndex = currentIndex - 99;
+                    _correctAnswerIndex = testIndex - 99;
                     _maxQuestions = 100;
                 }
                 else
                 {
-                    _correctAnswerIndex = currentIndex - 9;
+                    _correctAnswerIndex = testIndex - 9;
                     _maxQuestions = 10;
                 }
 
@@ -254,10 +254,15 @@ namespace SmartWords.ViewModels
             SaveControlIndex();
         }
 
+        private void OnSpeakWord(object obj)
+        {
+            _ttsService.Speak(_words[currentIndex].En);
+        }
+
         private MainWindowViewModel mainWindow;
         private Unlearned _unlearned;
 
-        public Test(MainWindowViewModel viewModel)
+        public Test(MainWindowViewModel viewModel,TextToSpeechService ttsService)
         {
             mainWindow = viewModel;
             mainWindow.CurrentIndexChanged += OnCurrentIndexChanged;
@@ -265,8 +270,14 @@ namespace SmartWords.ViewModels
 
             ButtonClickCommand = new LambdaCommand(OnButtonClick);
 
+            _ttsService = ttsService ?? throw new ArgumentNullException(nameof(ttsService));
+
+            SpeakWordCommand = new LambdaCommand(OnSpeakWord);
+
             ServiceLocator.Register(this);
             WindowClosingCommand = new LambdaCommand((object _) => ServiceLocator.ExecuteAllSaves());
+
+            SpeakWordCommand = new LambdaCommand(OnSpeakWord);
 
             _unlearned = new(this);
         }

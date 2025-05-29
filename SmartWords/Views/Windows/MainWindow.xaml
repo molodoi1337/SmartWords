@@ -187,7 +187,7 @@
                 <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
             </EventTrigger>
         </TabControl.Triggers>
-
+        
         <TabItem Header="Быстрое изучение" Visibility="{Binding TestViewModel.StudyTabVisiable}">
             <Grid Cursor="">
                 <Grid.RowDefinitions>
@@ -274,6 +274,32 @@
                     <Button x:Name="Answer2" Content="{Binding Button2Text}" Command="{Binding ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Style="{StaticResource AnswerButtonStyle}" Width="450" Height="40" Margin="0,5"/>
                     <Button x:Name="Answer3" Content="{Binding Button3Text}" Command="{Binding ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Style="{StaticResource AnswerButtonStyle}" Width="450" Height="40" Margin="0,5"/>
                 </StackPanel>
+            </Grid>
+        </TabItem>
+
+        <TabItem Header="Поиск">
+            <Grid Width="300" Height="40" VerticalAlignment="Top">
+                <Border CornerRadius="20"
+                    BorderBrush="Black"
+                    BorderThickness="2"
+                    Background="White">
+                    <TextBox x:Name="SearchBox"
+                         Margin="10,0,40,0"
+                         VerticalAlignment="Center"
+                         FontSize="14"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Foreground="Black"/>
+                </Border>
+                <Image Source="/Resources/Images/icons8-поиск-50.png"
+
+                   Width="20" Height="20"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Right"
+                   Margin="0,0,10,0"/>
+                <ListView x:Name="SearchListView" ItemsSource="{Binding}">
+                    
+                </ListView>
             </Grid>
         </TabItem>
     </TabControl>

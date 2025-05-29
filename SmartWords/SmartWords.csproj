@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Images\ChatGPT Image 19 мая 2025 г., 20_22_22 %282%29.png" />
+    <None Remove="Resources\Images\icons8-поиск-50.png" />
     <None Remove="Resources\Images\soundIcon.png" />
   </ItemGroup>
 
@@ -25,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Images\icons8-поиск-50.png" />
     <Resource Include="Resources\Images\soundIcon.png" />
   </ItemGroup>
 
@@ -47,6 +50,10 @@
 		<Reference Include="System.Speech">
 			<HintPath>C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v8.0\System.Speech.dll</HintPath>
 		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <SplashScreen Include="Resources\Images\ChatGPT Image 19 мая 2025 г., 20_22_22 (2).png" />
 	</ItemGroup>
 
 </Project>

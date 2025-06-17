@@ -5,7 +5,6 @@ using SmartWords.Services;
 using SmartWords.ViewModels.Base;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml.Serialization;
 
 namespace SmartWords.ViewModels
 {
@@ -249,6 +248,9 @@ namespace SmartWords.ViewModels
                 TestTabVisiable = Visibility.Collapsed;
                 StudyTabVisiable = Visibility.Visible;
             }
+
+            SelectedIndex = 0;
+
             SaveTestStatusVisibility();
             SaveStudentStatusVisibility();
             SaveControlIndex();
@@ -262,7 +264,7 @@ namespace SmartWords.ViewModels
         private MainWindowViewModel mainWindow;
         private Unlearned _unlearned;
 
-        public Test(MainWindowViewModel viewModel,TextToSpeechService ttsService)
+        public Test(MainWindowViewModel viewModel, TextToSpeechService ttsService)
         {
             mainWindow = viewModel;
             mainWindow.CurrentIndexChanged += OnCurrentIndexChanged;

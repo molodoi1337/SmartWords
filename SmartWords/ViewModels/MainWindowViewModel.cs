@@ -11,6 +11,8 @@ namespace SmartWords.ViewModels
 {
     internal class MainWindowViewModel : ViewModel, ISavable
     {
+        public string filePath = "Data\\mainWords.json";
+
         #region NextWordCommand
         private Word _currentWord;
         public Word CurrentWord
@@ -39,7 +41,7 @@ namespace SmartWords.ViewModels
             set => Set(ref _words, value);
         }
 
-        private void LoadWordsFromJson(string filePath)
+        public void LoadWordsFromJson(string filePath)
         {
             try
             {
@@ -129,9 +131,9 @@ namespace SmartWords.ViewModels
         {
             NextWordCommand = new LambdaCommand(OnNextWordCommandExecuted, CanExecuteNextWord);
             CurrentIndex = LoadCurrentIndex();
-            LoadWordsFromJson("C:\\Users\\nniki\\source\\repos\\SmartWords\\SmartWords\\Data\\words.json");
-            
-            TestViewModel = new Test(this,_tts);
+            LoadWordsFromJson(filePath);
+
+            TestViewModel = new Test(this, _tts);
 
             PieChartVM = new PieChart(this);
 

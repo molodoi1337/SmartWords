@@ -1,4 +1,4 @@
-﻿<Window x:Class="SmartWords.Views.Windows.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:SmartWords.ViewModels" 
@@ -6,20 +6,20 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf" 
         xmlns:tts="clr-namespace:SmartWords.Services"
+        xmlns:searchWord="clr-namespace:SmartWords.ViewModels"
+        xmlns:Syncfusion="http://schemas.syncfusion.com/wpf" x:Class="SmartWords.Views.Windows.MainWindow"
         Title="Smart Words" Height="600" Width="1000"
         WindowStartupLocation="CenterScreen"
         Background="#FF1E1E1E"
         Foreground="White"
         FontFamily="Segoe UI">
-    
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding TestViewModel.WindowClosingCommand}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-    
+
     <Window.Resources>
         <tts:TextToSpeechService x:Key="TTS"/>
+
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="#FF333333"/>
+        </Style>
 
         <!-- Ресурс для тени -->
         <DropShadowEffect x:Key="DropShadowEffect" ShadowDepth="0" BlurRadius="10" Color="#40000000"/>
@@ -37,7 +37,7 @@
         </Storyboard>
 
         <!-- Стили для кнопок -->
-        <Style TargetType="Button">
+        <Style TargetType="{x:Type Button}">
             <Setter Property="Background" Value="#FF333333"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderBrush" Value="#FF555555"/>
@@ -47,7 +47,7 @@
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
+                    <ControlTemplate TargetType="{x:Type Button}">
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
@@ -68,7 +68,7 @@
         </Style>
 
         <!-- Стиль для кнопок в тесте -->
-        <Style TargetType="Button" x:Key="AnswerButtonStyle">
+        <Style TargetType="{x:Type Button}" x:Key="AnswerButtonStyle">
             <Setter Property="Background" Value="#FF333333"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderBrush" Value="#FF555555"/>
@@ -78,7 +78,7 @@
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
+                    <ControlTemplate TargetType="{x:Type Button}">
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
@@ -112,21 +112,21 @@
         </Style>
 
         <!-- Стили для текстовых блоков -->
-        <Style TargetType="TextBlock">
+        <Style TargetType="{x:Type TextBlock}">
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="Margin" Value="10"/>
         </Style>
 
         <!-- Стиль для TabControl -->
-        <Style TargetType="TabControl">
+        <Style TargetType="{x:Type TabControl}">
             <Setter Property="Background" Value="#FF1E1E1E"/>
             <Setter Property="BorderBrush" Value="#FF555555"/>
             <Setter Property="Foreground" Value="White"/>
         </Style>
 
         <!-- Стиль для TabItem -->
-        <Style TargetType="TabItem">
+        <Style TargetType="{x:Type TabItem}">
             <Setter Property="Background" Value="#FF2D2D2D"/>
             <Setter Property="BorderBrush" Value="#FF555555"/>
             <Setter Property="Foreground" Value="White"/>
@@ -134,8 +134,8 @@
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Border Name="Border" 
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Border x:Name="Border" 
                             Background="{TemplateBinding Background}" 
                             BorderBrush="{TemplateBinding BorderBrush}" 
                             BorderThickness="1" 
@@ -161,9 +161,9 @@
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
                              From="0" To="1" Duration="0:0:0.5"/>
         </Storyboard>
-        
+
         <!-- ToolTip для графика -->
-        <Style x:Key="CustomTooltip" TargetType="lvc:DefaultTooltip">
+        <Style x:Key="CustomTooltip" TargetType="{x:Type lvc:DefaultTooltip}">
             <Setter Property="Background" Value="#FF333333"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderBrush" Value="#FF555555"/>
@@ -172,22 +172,28 @@
         </Style>
 
         <!-- Стиль для Grid с анимацией -->
-        <Style TargetType="Grid">
+        <Style TargetType="{x:Type Grid}">
             <Style.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
+                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
                     <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
                 </EventTrigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
 
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding TestViewModel.WindowClosingCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
     <TabControl SelectedIndex="{Binding TestViewModel.SelectedIndex}">
         <TabControl.Triggers>
-            <EventTrigger RoutedEvent="Loaded">
+            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
                 <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
             </EventTrigger>
         </TabControl.Triggers>
-        
+
         <TabItem Header="Быстрое изучение" Visibility="{Binding TestViewModel.StudyTabVisiable}">
             <Grid Cursor="">
                 <Grid.RowDefinitions>
@@ -199,7 +205,7 @@
                 <!-- Основной контент -->
                 <Grid Grid.Row="1" Margin="20">
                     <Grid.Triggers>
-                        <EventTrigger RoutedEvent="Loaded">
+                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
                             <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
                         </EventTrigger>
                     </Grid.Triggers>
@@ -220,9 +226,9 @@
                             <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,0,10">
                                 <TextBlock Text="{Binding CurrentWord.En}" FontSize="35" VerticalAlignment="Center"/>
                                 <Button Command="{Binding SpeakWordCommand}" Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand" Height="30">
-                                     <Image Source="\Resources\Images\soundIcon.png" Width="30" Height="30" Margin="10,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Cursor="Hand" />
+                                    <Image Source="\Resources\Images\soundIcon.png" Width="30" Height="30" Margin="10,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Cursor="Hand" />
                                 </Button>
-                               
+
                             </StackPanel>
 
                             <TextBlock Text="{Binding CurrentWord.Ru}" Grid.Row="1" FontSize="35" Width="auto" Height="100" VerticalAlignment="Top" TextWrapping="Wrap"/>
@@ -237,11 +243,7 @@
                             <TextBlock Text="График успехов:" FontSize="18" FontWeight="Bold"/>
                             <lvc:PieChart Series="{Binding PieChartVM.PieChartSeries}" LegendLocation="Bottom" TooltipTimeout="0:0:0:0.2" Height="340">
                                 <lvc:PieChart.DataTooltip>
-                                    <lvc:DefaultTooltip Style="{StaticResource CustomTooltip}" SelectionMode="OnlySender">
-                                        <lvc:DefaultTooltip.BulletSize>
-                                            <Binding RelativeSource="{RelativeSource Self}" Path="FontSize"/>
-                                        </lvc:DefaultTooltip.BulletSize>
-                                    </lvc:DefaultTooltip>
+                                    <lvc:DefaultTooltip Style="{StaticResource CustomTooltip}" SelectionMode="OnlySender" BulletSize="{Binding FontSize, RelativeSource={RelativeSource Mode=Self}}"/>
                                 </lvc:PieChart.DataTooltip>
                             </lvc:PieChart>
                             <Button Content="Посмотреть за месяц" VerticalAlignment="Bottom"/>
@@ -253,7 +255,7 @@
                 <Border Grid.Row="2" Background="#FF2D2D2D" CornerRadius="10" Padding="10" Margin="20"
                         Effect="{StaticResource DropShadowEffect}">
                     <Border.Triggers>
-                        <EventTrigger RoutedEvent="Loaded">
+                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
                             <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
                         </EventTrigger>
                     </Border.Triggers>
@@ -270,37 +272,27 @@
                 <TextBlock Text="{Binding Transctiption}" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="40" Width="auto" Height="auto" Cursor=""/>
 
                 <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="">
-                    <Button x:Name="Answer1" Content="{Binding Button1Text}" Command="{Binding ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Style="{StaticResource AnswerButtonStyle}" Width="450" Height="40" Margin="0,5"/>
-                    <Button x:Name="Answer2" Content="{Binding Button2Text}" Command="{Binding ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Style="{StaticResource AnswerButtonStyle}" Width="450" Height="40" Margin="0,5"/>
-                    <Button x:Name="Answer3" Content="{Binding Button3Text}" Command="{Binding ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Style="{StaticResource AnswerButtonStyle}" Width="450" Height="40" Margin="0,5"/>
+                    <Button x:Name="Answer1" Content="{Binding Button1Text}" Command="{Binding ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}}" Style="{StaticResource AnswerButtonStyle}" Width="450" Height="40" Margin="0,5"/>
+                    <Button x:Name="Answer2" Content="{Binding Button2Text}" Command="{Binding ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}}" Style="{StaticResource AnswerButtonStyle}" Width="450" Height="40" Margin="0,5"/>
+                    <Button x:Name="Answer3" Content="{Binding Button3Text}" Command="{Binding ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}}" Style="{StaticResource AnswerButtonStyle}" Width="450" Height="40" Margin="0,5"/>
                 </StackPanel>
             </Grid>
         </TabItem>
 
-        <TabItem Header="Поиск">
-            <Grid Width="300" Height="40" VerticalAlignment="Top">
+        <TabItem Header="Поиск" x:Name="SearchItem">
+            <StackPanel>
                 <Border CornerRadius="20"
                     BorderBrush="Black"
                     BorderThickness="2"
-                    Background="White">
-                    <TextBox x:Name="SearchBox"
-                         Margin="10,0,40,0"
-                         VerticalAlignment="Center"
-                         FontSize="14"
-                         Background="Transparent"
-                         BorderThickness="0"
-                         Foreground="Black"/>
+                    Background="White" Width="400" Height="35">
+                    <TextBox x:Name="SearchBox" VerticalAlignment="Top" FontSize="14" 
+                             Background="Transparent" BorderThickness="0" Foreground="Black"
+                             TextChanged="SearchBox_TextChanged" Height="35" Width="400" Margin="10,5,0,0"/>
                 </Border>
-                <Image Source="/Resources/Images/icons8-поиск-50.png"
+                <Image Source="/Resources/Images/icons8-поиск-50.png" Width="20" Height="20" Margin="330,-33,0,0"/>
 
-                   Width="20" Height="20"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Right"
-                   Margin="0,0,10,0"/>
-                <ListView x:Name="SearchListView" ItemsSource="{Binding}">
-                    
-                </ListView>
-            </Grid>
+                <Syncfusion:SfDataGrid x:Name="sfDataGrid" x:FieldModifier="public" Height="480" RowHeight="50"  ColumnSizer="Auto" HorizontalAlignment="Center"/>
+            </StackPanel>
         </TabItem>
     </TabControl>
 </Window>

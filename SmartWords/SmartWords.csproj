@@ -19,10 +19,9 @@
     <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
     <PackageReference Include="LiveCharts.Wpf.NetCore3" Version="0.9.8" />
     <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.43.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.3" />
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.4" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-    <PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="29.2.7" />
     <PackageReference Include="System.Text.Json" Version="9.0.3" />
   </ItemGroup>
 
@@ -40,6 +39,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Data\mainWords.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

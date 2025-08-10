@@ -1,5 +1,4 @@
 ﻿using LiveCharts;
-using LiveCharts.Definitions.Charts;
 using LiveCharts.Wpf;
 using SmartWords.ViewModels.Base;
 using System.IO;
@@ -30,6 +29,10 @@ namespace SmartWords.ViewModels
             if (File.Exists("unlearned_words.json"))
             {
                 string json = File.ReadAllText("unlearned_words.json");
+
+                if (string.IsNullOrWhiteSpace(json))
+                    return 0;
+
                 var wordsFromFile = JsonSerializer.Deserialize<List<int>>(json);
                 return wordsFromFile.Count;
             }

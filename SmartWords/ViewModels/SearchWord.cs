@@ -1,22 +1,21 @@
-﻿using SmartWords.Infrastructure.Commands.Base;
-using SmartWords.Models;
-using SmartWords.Views.Windows;
+﻿using SmartWords.Models;
 using System.IO;
 using System.Text.Json;
-using System.Windows;
 
 namespace SmartWords.ViewModels
 {
     class SearchWord
     {
+        private readonly string unlearnedPath = "unlearned_words.json";
+        private readonly string allWordsPath = "Data\\mainWords.json";
+
         public List<Word> Words { get; set; }
-        public string filePath = "Data\\mainWords.json";
+        public List<Word> UnlearnedWords { get; set; }
 
-        public List<Word> LoadJson()
+        public List<Word> GetWords()
         {
-            var json = File.ReadAllText(filePath);
+            var json = File.ReadAllText(allWordsPath);
 
-            // Настройки для десериализации
             var options = new JsonSerializerOptions
             {
                 ReadCommentHandling = JsonCommentHandling.Skip, // Пропуск комментариев
@@ -27,6 +26,20 @@ namespace SmartWords.ViewModels
             Words = JsonSerializer.Deserialize<List<Word>>(json, options);
 
             return Words;
+        }
+
+        public List<Word> GetUnlearnedWords()
+        {
+            var json = File.ReadAllText(unlearnedPath);
+
+            if (string.IsNullOrWhiteSpace(json))
+                return UnlearnedWords = null;
+
+            var UnlearnedWordsId = JsonSerializer.Deserialize<List<int>>(json);
+
+            UnlearnedWords = Words.Where(word => UnlearnedWordsId.Contains(word.Id)).ToList();
+
+            return UnlearnedWords;
         }
     }
 }

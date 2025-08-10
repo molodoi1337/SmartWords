@@ -1,4 +1,5 @@
-﻿using SmartWords.ViewModels;
+﻿using SmartWords.Models;
+using SmartWords.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -13,22 +14,54 @@ namespace SmartWords.Views.Windows
 
             SearchWord searchWord = new();
 
-            sfDataGrid.SearchHelper.AllowFiltering = true;
-            sfDataGrid.SearchHelper.SearchBrush = Brushes.Gray;
-           
+            SearchDataGrid.SearchHelper.AllowFiltering = true;
+            SearchDataGrid.SearchHelper.SearchBrush = Brushes.Gray;
+
+            UnlearnedDataGrid.SearchHelper.SearchBrush = Brushes.Gray;
+            UnlearnedDataGrid.SearchHelper.AllowFiltering = true;
+
 
             foreach (Window window in Application.Current.Windows)
             {
                 if (window is MainWindow)
                 {
-                    ((MainWindow)window).sfDataGrid.ItemsSource = searchWord.LoadJson();
+                    SearchDataGrid.ColumnSizer = Syncfusion.UI.Xaml.Grid.GridLengthUnitType.Star;
+                    SearchDataGrid.ScrollMode = Syncfusion.UI.Xaml.Grid.ScrollMode.Async;
+                    ((MainWindow)window).SearchDataGrid.ItemsSource = searchWord.GetWords().Select(item => new
+                    {
+                        Английский = item.En,
+                        Русский = item.Ru,
+                        Транскринция = item.Tr,
+                    });
+
+                    var unlearnedWords = searchWord.GetUnlearnedWords();
+
+                    if (unlearnedWords?.Any() != true)
+                    {
+                        ((MainWindow)window).UnlearnedDataGrid.ItemsSource = new List<Word> {
+                            new Word {En = "Пока нет не выученных слов" }
+                        }
+                        .Select(item => new { Ожидаем = "Пусто" });
+                        UnlearnedDataGrid.Height = 100;
+                    }
+                    else
+                    {
+                        UnlearnedDataGrid.ColumnSizer = Syncfusion.UI.Xaml.Grid.GridLengthUnitType.Star;
+                        UnlearnedDataGrid.ScrollMode = Syncfusion.UI.Xaml.Grid.ScrollMode.Async;
+                        ((MainWindow)window).UnlearnedDataGrid.ItemsSource = searchWord.GetUnlearnedWords().Select(item => new
+                        {
+                            Английский = item.En,
+                            Русский = item.Ru,
+                            Транскринция = item.Tr,
+                        });
+                    }
                 }
             }
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            sfDataGrid.SearchHelper.Search(SearchBox.Text);
+            SearchDataGrid.SearchHelper.Search(SearchBox.Text);
         }
     }
 }

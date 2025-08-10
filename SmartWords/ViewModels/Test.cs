@@ -195,6 +195,7 @@ namespace SmartWords.ViewModels
                 {
                     button.Tag = null;
                     _isAnimating = false; // Разблокируем кнопки
+
                     if (_correctAnswerIndex % _maxQuestions == 0 && _correctAnswerIndex != 0)
                     {
                         TestTabVisiable = Visibility.Collapsed;

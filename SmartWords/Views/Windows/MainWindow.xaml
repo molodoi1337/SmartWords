@@ -291,8 +291,13 @@
                 </Border>
                 <Image Source="/Resources/Images/icons8-поиск-50.png" Width="20" Height="20" Margin="330,-33,0,0"/>
 
-                <Syncfusion:SfDataGrid x:Name="sfDataGrid" x:FieldModifier="public" Height="480" RowHeight="50"  ColumnSizer="Auto" HorizontalAlignment="Center"/>
+                <Syncfusion:SfDataGrid x:Name="SearchDataGrid" Height="480" RowHeight="50"  ColumnSizer="Auto" HorizontalAlignment="Center"/>
             </StackPanel>
+        </TabItem>
+
+        <TabItem Header="Невыученные">
+            <Syncfusion:SfDataGrid x:Name="UnlearnedDataGrid" RowHeight="50" Height="480" ColumnSizer="Auto" HorizontalAlignment="Center"/>
+            
         </TabItem>
     </TabControl>
 </Window>

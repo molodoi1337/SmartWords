@@ -8,7 +8,7 @@ namespace SmartWords.Views.Windows
 {
     public partial class MainWindow : Window
     {
-        public static MainWindow Instance { get; private set; }
+        public static MainWindow Instance { get; private set; } // Статическое свойство для доступа к экземпляру
         SearchWord searchWord = new();
 
         public MainWindow()
@@ -25,7 +25,6 @@ namespace SmartWords.Views.Windows
             UnlearnedDataGrid.SearchHelper.AllowFiltering = true;
 
             LoadTable();
-            
         }
 
         public void LoadTable()

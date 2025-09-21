@@ -3,6 +3,7 @@ using SmartWords.Interface;
 using SmartWords.Models;
 using SmartWords.Services;
 using SmartWords.ViewModels.Base;
+using SmartWords.Views.Windows;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -172,7 +173,7 @@ namespace SmartWords.ViewModels
             }
             return list;
         }
-
+        MainWindow majorWindow = (MainWindow)Application.Current.MainWindow;
         private void OnButtonClick(object? parameter)
         {
             if (_isAnimating || parameter is not Button button)
@@ -204,6 +205,10 @@ namespace SmartWords.ViewModels
                         _isPassingTest = false;
                         _unlearned.Save();
                         mainWindow.PieChartVM.UpdateChart();
+                        if (MainWindow.Instance != null)
+                        {
+                            MainWindow.Instance.LoadTable();
+                        }
                     }
                     else
                     {

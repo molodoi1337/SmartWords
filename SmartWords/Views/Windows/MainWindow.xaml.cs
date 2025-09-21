@@ -8,11 +8,15 @@ namespace SmartWords.Views.Windows
 {
     public partial class MainWindow : Window
     {
+        public static MainWindow Instance { get; private set; }
+        SearchWord searchWord = new();
+
         public MainWindow()
         {
             InitializeComponent();
 
-            SearchWord searchWord = new();
+            Instance = this;
+            Application.Current.MainWindow = this; // Устанавливаем главное окно
 
             SearchDataGrid.SearchHelper.AllowFiltering = true;
             SearchDataGrid.SearchHelper.SearchBrush = Brushes.Gray;
@@ -20,7 +24,12 @@ namespace SmartWords.Views.Windows
             UnlearnedDataGrid.SearchHelper.SearchBrush = Brushes.Gray;
             UnlearnedDataGrid.SearchHelper.AllowFiltering = true;
 
+            LoadTable();
+            
+        }
 
+        public void LoadTable()
+        {
             foreach (Window window in Application.Current.Windows)
             {
                 if (window is MainWindow)

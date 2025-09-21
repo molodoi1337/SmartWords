@@ -246,7 +246,6 @@
                                     <lvc:DefaultTooltip Style="{StaticResource CustomTooltip}" SelectionMode="OnlySender" BulletSize="{Binding FontSize, RelativeSource={RelativeSource Mode=Self}}"/>
                                 </lvc:PieChart.DataTooltip>
                             </lvc:PieChart>
-                            <Button Content="Посмотреть за месяц" VerticalAlignment="Bottom"/>
                         </Grid>
                     </Border>
                 </Grid>

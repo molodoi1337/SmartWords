@@ -173,7 +173,9 @@ namespace SmartWords.ViewModels
             }
             return list;
         }
+
         MainWindow majorWindow = (MainWindow)Application.Current.MainWindow;
+
         private void OnButtonClick(object? parameter)
         {
             if (_isAnimating || parameter is not Button button)

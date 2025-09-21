@@ -137,7 +137,6 @@ namespace SmartWords.ViewModels
 
             PieChartVM = new PieChart(this);
 
-
             ServiceLocator.Register(this);
         }
     }

@@ -30,6 +30,11 @@ namespace SmartWords.ViewModels
 
         public List<Word> GetUnlearnedWords()
         {
+            if (!File.Exists(unlearnedPath))
+            {
+                File.WriteAllText(unlearnedPath, "[]");
+            }
+
             var json = File.ReadAllText(unlearnedPath);
 
             if (string.IsNullOrWhiteSpace(json))
